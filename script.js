@@ -1,47 +1,42 @@
-body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: #1e1e1e;
-  color: white;
-}
+const canvas = document.getElementById("figmaCanvas");
+const ctx = canvas.getContext("2d");
 
-.toolbar {
-  background: #2d2d2d;
-  padding: 10px;
-  display: flex;
-  gap: 10px;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  border-bottom: 1px solid #444;
-  z-index: 10;
-}
+let tool = "select";
+let isDrawing = false;
+let startX = 0;
+let startY = 0;
 
-.toolbar button {
-  background: #3a3a3a;
-  border: none;
-  color: white;
-  padding: 8px 12px;
-  font-size: 14px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
+document.getElementById("selectTool").onclick = () => tool = "select";
+document.getElementById("rectTool").onclick = () => tool = "rect";
+document.getElementById("circleTool").onclick = () => tool = "circle";
+document.getElementById("clearCanvas").onclick = () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+};
 
-.toolbar button:hover {
-  background: #505050;
-}
+canvas.addEventListener("mousedown", (e) => {
+  if (tool === "select") return;
+  isDrawing = true;
+  startX = e.offsetX;
+  startY = e.offsetY;
+});
 
-.canvas-container {
-  margin-top: 50px;
-  display: flex;
-  justify-content: center;
-  padding: 20px;
-}
+canvas.addEventListener("mouseup", (e) => {
+  if (!isDrawing) return;
+  isDrawing = false;
+  const endX = e.offsetX;
+  const endY = e.offsetY;
 
-canvas {
-  background: #fff;
-  border-radius: 10px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.5);
-}
+  const width = endX - startX;
+  const height = endY - startY;
+
+  ctx.fillStyle = "#3498db";
+
+  if (tool === "rect") {
+    ctx.fillRect(startX, startY, width, height);
+  } else if (tool === "circle") {
+    const radius = Math.sqrt(width ** 2 + height ** 2);
+    ctx.beginPath();
+    ctx.arc(startX, startY, radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+});
